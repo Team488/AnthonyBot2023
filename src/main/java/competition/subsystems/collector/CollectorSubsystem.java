@@ -27,7 +27,7 @@ public class CollectorSubsystem extends BaseSubsystem {
         this.collectorMotor = sparkMaxFactory.create(new DeviceInfo(25, true), getPrefix(), "CollectorMotor");
 
         intakePower = 0.1;
-        ejectPower = 0.1;
+        ejectPower = -0.1;
     }
 
     private void changeCollector(CollectorState state) {
