@@ -5,12 +5,12 @@ import javax.inject.Inject;
 import competition.subsystems.collector.CollectorSubsystem;
 import xbot.common.command.BaseCommand;
 
-public class IntakeCollectorCommand extends BaseCommand {
+public class EjectCollectorCommand extends BaseCommand {
 
     CollectorSubsystem collector;
 
     @Inject
-    public IntakeCollectorCommand(CollectorSubsystem collector) {
+    public EjectCollectorCommand(CollectorSubsystem collector) {
         this.collector = collector;
 
         addRequirements(collector);
@@ -23,7 +23,8 @@ public class IntakeCollectorCommand extends BaseCommand {
 
     @Override
     public void execute() {
-        collector.intake();
+        collector.eject();
     }
+
     
 }
