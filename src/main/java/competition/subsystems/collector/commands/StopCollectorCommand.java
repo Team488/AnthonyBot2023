@@ -17,6 +17,7 @@ public class StopCollectorCommand extends BaseCommand {
 
     @Override
     public void initialize() {
+        
     }
     
     @Override

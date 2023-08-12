@@ -8,6 +8,7 @@ import competition.subsystems.collector.commands.ExtendCollectorCommand;
 import competition.subsystems.collector.commands.IntakeCollectorCommand;
 import competition.subsystems.collector.commands.RetractCollectorCommand;
 import competition.subsystems.collector.commands.StopCollectorCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import xbot.common.controls.sensors.XXboxController.XboxButton;
 import xbot.common.subsystems.pose.commands.SetRobotHeadingCommand;
 
@@ -34,14 +35,17 @@ public class OperatorCommandMap {
         resetHeading.setHeadingToApply(90);
         operatorInterface.gamepad.getifAvailable(1).onTrue(resetHeading);
 
-        // collector extend and retract
-        operatorInterface.gamepad.getXboxButton(XboxButton.A).onTrue(extendCollectorCommand);
-        operatorInterface.gamepad.getXboxButton(XboxButton.B).onTrue(retractCollectorCommand);
-        
-        // collector motor intake and eject
-        operatorInterface.gamepad.getXboxButton(XboxButton.Y).onTrue(intakeCollectorCommand);
-        operatorInterface.gamepad.getXboxButton(XboxButton.X).onTrue(ejectCollectorCommand);
-        operatorInterface.gamepad.getXboxButton(XboxButton.RightBumper).onTrue(stopCollectorCommand);
+        // collector extend and intake together, retract and stop together
+        ParallelCommandGroup extendAndIntake = extendCollectorCommand.alongWith(intakeCollectorCommand);
+        ParallelCommandGroup retractAndStopIntake = retractCollectorCommand.alongWith(stopCollectorCommand);
+    
+        operatorInterface.gamepad.getXboxButton(XboxButton.A).onTrue(extendAndIntake);
+        operatorInterface.gamepad.getXboxButton(XboxButton.A).onFalse(retractAndStopIntake);
 
+        ParallelCommandGroup extendAndEject = extendCollectorCommand.alongWith(ejectCollectorCommand);
+        ParallelCommandGroup retractAndStopEject = retractCollectorCommand.alongWith(stopCollectorCommand);
+
+        operatorInterface.gamepad.getXboxButton(XboxButton.B).onTrue(extendAndEject);
+        operatorInterface.gamepad.getXboxButton(XboxButton.B).onFalse(retractAndStopEject);
     }
 }
