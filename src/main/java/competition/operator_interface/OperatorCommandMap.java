@@ -26,24 +26,28 @@ public class OperatorCommandMap {
     public void setupMyCommands(
             OperatorInterface operatorInterface,
             SetRobotHeadingCommand resetHeading, 
-            ExtendCollectorCommand extendCollectorCommand, 
-            RetractCollectorCommand retractCollectorCommand,
+            ExtendCollectorCommand extendCollectorCommandForIntake, 
+            ExtendCollectorCommand extendCollectorCommandForEject, 
+            RetractCollectorCommand retractCollectorCommandForIntake,
+            RetractCollectorCommand retractCollectorCommandForEject,
             IntakeCollectorCommand intakeCollectorCommand,
             EjectCollectorCommand ejectCollectorCommand,
-            StopCollectorCommand stopCollectorCommand)
+            StopCollectorCommand stopCollectorCommandForIntake,
+            StopCollectorCommand stopCollectorCommandForEject)
     {
         resetHeading.setHeadingToApply(90);
         operatorInterface.gamepad.getifAvailable(1).onTrue(resetHeading);
 
-        // collector extend and intake together, retract and stop together
-        ParallelCommandGroup extendAndIntake = extendCollectorCommand.alongWith(intakeCollectorCommand);
-        ParallelCommandGroup retractAndStopIntake = retractCollectorCommand.alongWith(stopCollectorCommand);
+        // collector extend/retract intake
+        ParallelCommandGroup extendAndIntake = extendCollectorCommandForIntake.alongWith(intakeCollectorCommand);
+        ParallelCommandGroup retractAndStopIntake = retractCollectorCommandForIntake.alongWith(stopCollectorCommandForIntake);
     
         operatorInterface.gamepad.getXboxButton(XboxButton.A).onTrue(extendAndIntake);
         operatorInterface.gamepad.getXboxButton(XboxButton.A).onFalse(retractAndStopIntake);
 
-        ParallelCommandGroup extendAndEject = extendCollectorCommand.alongWith(ejectCollectorCommand);
-        ParallelCommandGroup retractAndStopEject = retractCollectorCommand.alongWith(stopCollectorCommand);
+        // collector extend/retract eject
+        ParallelCommandGroup extendAndEject = extendCollectorCommandForEject.alongWith(ejectCollectorCommand);
+        ParallelCommandGroup retractAndStopEject = retractCollectorCommandForEject.alongWith(stopCollectorCommandForEject);
 
         operatorInterface.gamepad.getXboxButton(XboxButton.B).onTrue(extendAndEject);
         operatorInterface.gamepad.getXboxButton(XboxButton.B).onFalse(retractAndStopEject);
