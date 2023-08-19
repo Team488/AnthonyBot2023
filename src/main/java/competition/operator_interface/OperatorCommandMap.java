@@ -35,7 +35,8 @@ public class OperatorCommandMap {
             StopCollectorCommand stopCollectorCommandForIntake,
             StopCollectorCommand stopCollectorCommandForEject,
             IntakeCollectorCommand intakeCollectorCommand,
-            EjectCollectorCommand ejectCollectorCommand)
+            EjectCollectorCommand ejectCollectorCommand,
+            StopCollectorCommand stopCollectorCommand)
     {
         resetHeading.setHeadingToApply(90);
         operatorInterface.gamepad.getifAvailable(1).onTrue(resetHeading);
@@ -54,8 +55,9 @@ public class OperatorCommandMap {
         operatorInterface.gamepad.getXboxButton(XboxButton.B).onTrue(extendAndEject);
         operatorInterface.gamepad.getXboxButton(XboxButton.B).onFalse(retractAndStopEject);
 
-        // only runs eject and intake
+        // only runs motors
         operatorInterface.gamepad.getXboxButton(XboxButton.LeftTrigger).onTrue(intakeCollectorCommand);
         operatorInterface.gamepad.getXboxButton(XboxButton.RightTrigger).onTrue(ejectCollectorCommand);
+        operatorInterface.gamepad.getXboxButton(XboxButton.X).onTrue(stopCollectorCommand);
     }
 }
