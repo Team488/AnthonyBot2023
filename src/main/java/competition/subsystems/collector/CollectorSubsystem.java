@@ -94,4 +94,8 @@ public class CollectorSubsystem extends BaseSubsystem {
         boolean hasPiece = (motorSpeed.get() < hasGamePieceThreshold.get() && intakeState == IntakeState.Intaking);
         hasGamePiece.set(hasPiece);
     }
+
+    public boolean hasGamePiece() {
+        return hasGamePiece.get();
+    }
 }
