@@ -1,7 +1,5 @@
 package competition.operator_interface;
 
-import java.util.stream.Collector;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -35,6 +33,7 @@ public class OperatorCommandMap {
             IntakeCollectorCommand intakeCollectorCommand,
             EjectCollectorCommand ejectCollectorCommand,
             StopCollectorCommand stopCollectorCommand,
+            StopCollectorCommand stopCollectorCommandForRetract,
             RetractCollectorCommand retractCollectorCommand,
             CollectorSubsystem collector,
             IntakeCollectorCommand intakeCollectorCommandForWhenExtended,
@@ -43,17 +42,23 @@ public class OperatorCommandMap {
         operatorInterface.gamepad.getifAvailable(1).onTrue(resetHeading);
 
 
-        ParallelCommandGroup extendAndIntake = extendCollectorCommandForIntake.alongWith(intakeCollectorCommandForWhenExtended);
-        ParallelCommandGroup retractAndIntake = retractCollectorCommandForIntake.alongWith(intakeCollectorCommandForWhenRetracted);
-
+        
         // only runs motors
         operatorInterface.gamepad.getXboxButton(XboxButton.A).onTrue(intakeCollectorCommand);
         operatorInterface.gamepad.getXboxButton(XboxButton.B).onTrue(ejectCollectorCommand);
         operatorInterface.gamepad.getXboxButton(XboxButton.X).onTrue(stopCollectorCommand);
-
+        
         // extends and runs intake, retracts if has piece
+        ParallelCommandGroup extendAndIntake = extendCollectorCommandForIntake.alongWith(intakeCollectorCommandForWhenExtended);
+        ParallelCommandGroup retractAndIntake = retractCollectorCommandForIntake.alongWith(intakeCollectorCommandForWhenRetracted);
         ConditionalCommand extendAndIntakeThenRetractIfHasPiece = new ConditionalCommand(retractAndIntake, extendAndIntake, () -> collector.hasGamePiece());
 
         operatorInterface.gamepad.getXboxButton(XboxButton.RightTrigger).onTrue(extendAndIntakeThenRetractIfHasPiece);
+
+        ParallelCommandGroup retractAndStop = retractCollectorCommand.alongWith(stopCollectorCommandForRetract);
+
+        operatorInterface.gamepad.getXboxButton(XboxButton.RightTrigger).onFalse(retractAndStop);
+        
+
       }
 }

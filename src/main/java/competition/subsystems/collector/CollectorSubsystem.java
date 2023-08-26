@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import xbot.common.command.BaseSubsystem;
 import xbot.common.controls.actuators.XCANSparkMax;
 import xbot.common.controls.actuators.XSolenoid;
+import xbot.common.controls.sensors.XTimer;
 import xbot.common.injection.electrical_contract.DeviceInfo;
 import xbot.common.properties.BooleanProperty;
 import xbot.common.properties.DoubleProperty;
@@ -20,6 +21,8 @@ public class CollectorSubsystem extends BaseSubsystem {
     public DoubleProperty motorSpeed;
     public BooleanProperty hasGamePiece;
     public DoubleProperty hasGamePieceThreshold;
+    public double hasPieceTime;
+    public double startOfHasPiece;
     
 
     public enum CollectorState {
@@ -91,7 +94,18 @@ public class CollectorSubsystem extends BaseSubsystem {
     @Override
     public void periodic() {
         motorSpeed.set(collectorMotor.getVelocity());
-        boolean hasPiece = (motorSpeed.get() < hasGamePieceThreshold.get() && intakeState == IntakeState.Intaking);
+        if (motorSpeed.get() < hasGamePieceThreshold.get() && intakeState == IntakeState.Intaking) {
+            if (startOfHasPiece == 0) {
+                startOfHasPiece = XTimer.getFPGATimestamp();
+            }
+            if (startOfHasPiece > 0) {
+                hasPieceTime = XTimer.getFPGATimestamp() - startOfHasPiece;
+            }
+        }
+        else {
+            startOfHasPiece = 0;
+        }
+        boolean hasPiece = (motorSpeed.get() < hasGamePieceThreshold.get() && intakeState == IntakeState.Intaking && hasPieceTime > 0.3);
         hasGamePiece.set(hasPiece);
     }
 
