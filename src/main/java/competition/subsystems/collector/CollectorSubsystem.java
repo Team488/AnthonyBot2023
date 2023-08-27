@@ -23,6 +23,7 @@ public class CollectorSubsystem extends BaseSubsystem {
     public DoubleProperty hasGamePieceThreshold;
     public double hasPieceTime;
     public double startOfHasPiece;
+    public DoubleProperty hasGamePieceMotorPower;
     
 
     public enum CollectorState {
@@ -50,6 +51,7 @@ public class CollectorSubsystem extends BaseSubsystem {
         motorSpeed = pFact.createEphemeralProperty("MotorSpeed", 0);
         hasGamePiece = pFact.createEphemeralProperty("HasGamePiece", false);
         hasGamePieceThreshold = pFact.createPersistentProperty("GamePieceThreshold", 1000);
+        hasGamePieceMotorPower = pFact.createPersistentProperty("HasGamePieceMotorPower", 0.05);
 
     }
 
@@ -77,7 +79,12 @@ public class CollectorSubsystem extends BaseSubsystem {
     }
 
     public void intake() {
-        setMotorPower(intakePower.get());
+        if (hasGamePiece()) {
+            setMotorPower(hasGamePieceMotorPower.get());
+        }
+        else {
+            setMotorPower(intakePower.get());
+        }
         intakeState = IntakeState.Intaking;
     }
 
@@ -105,7 +112,7 @@ public class CollectorSubsystem extends BaseSubsystem {
         else {
             startOfHasPiece = 0;
         }
-        boolean hasPiece = (motorSpeed.get() < hasGamePieceThreshold.get() && intakeState == IntakeState.Intaking && hasPieceTime > 0.3);
+        boolean hasPiece = (motorSpeed.get() < hasGamePieceThreshold.get() && intakeState == IntakeState.Intaking && hasPieceTime > 0.2);
         hasGamePiece.set(hasPiece);
     }
 

@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import competition.subsystems.collector.CollectorSubsystem;
 import competition.subsystems.collector.commands.EjectCollectorCommand;
 import competition.subsystems.collector.commands.ExtendCollectorCommand;
+import competition.subsystems.collector.commands.ExtendIntakeAndRetractIfHasPieceCommand;
 import competition.subsystems.collector.commands.IntakeCollectorCommand;
 import competition.subsystems.collector.commands.RetractCollectorCommand;
 import competition.subsystems.collector.commands.StopCollectorCommand;
@@ -28,16 +29,15 @@ public class OperatorCommandMap {
     public void setupMyCommands(
             OperatorInterface operatorInterface,
             SetRobotHeadingCommand resetHeading,
-            ExtendCollectorCommand extendCollectorCommandForIntake, 
             RetractCollectorCommand retractCollectorCommandForIntake,
+            RetractCollectorCommand retractCollectorCommandForStop,
             IntakeCollectorCommand intakeCollectorCommand,
             EjectCollectorCommand ejectCollectorCommand,
             StopCollectorCommand stopCollectorCommand,
-            StopCollectorCommand stopCollectorCommandForRetract,
-            RetractCollectorCommand retractCollectorCommand,
             CollectorSubsystem collector,
-            IntakeCollectorCommand intakeCollectorCommandForWhenExtended,
-            IntakeCollectorCommand intakeCollectorCommandForWhenRetracted)   {
+            ExtendIntakeAndRetractIfHasPieceCommand extendIntakeAndRetractIfHasPieceCommand,
+            IntakeCollectorCommand intakeCollectorCommandForRetract,
+            StopCollectorCommand stopCollectorCommandForRetract)   {
         resetHeading.setHeadingToApply(90);
         operatorInterface.gamepad.getifAvailable(1).onTrue(resetHeading);
 
@@ -45,20 +45,20 @@ public class OperatorCommandMap {
         
         // only runs motors
         operatorInterface.gamepad.getXboxButton(XboxButton.A).onTrue(intakeCollectorCommand);
+        operatorInterface.gamepad.getXboxButton(XboxButton.A).onFalse(stopCollectorCommand);
         operatorInterface.gamepad.getXboxButton(XboxButton.B).onTrue(ejectCollectorCommand);
+        operatorInterface.gamepad.getXboxButton(XboxButton.B).onFalse(stopCollectorCommand);
         operatorInterface.gamepad.getXboxButton(XboxButton.X).onTrue(stopCollectorCommand);
+
         
         // extends and runs intake, retracts if has piece
-        ParallelCommandGroup extendAndIntake = extendCollectorCommandForIntake.alongWith(intakeCollectorCommandForWhenExtended);
-        ParallelCommandGroup retractAndIntake = retractCollectorCommandForIntake.alongWith(intakeCollectorCommandForWhenRetracted);
-        ConditionalCommand extendAndIntakeThenRetractIfHasPiece = new ConditionalCommand(retractAndIntake, extendAndIntake, () -> collector.hasGamePiece());
-
-        operatorInterface.gamepad.getXboxButton(XboxButton.RightTrigger).onTrue(extendAndIntakeThenRetractIfHasPiece);
-
-        ParallelCommandGroup retractAndStop = retractCollectorCommand.alongWith(stopCollectorCommandForRetract);
-
-        operatorInterface.gamepad.getXboxButton(XboxButton.RightTrigger).onFalse(retractAndStop);
+        operatorInterface.gamepad.getXboxButton(XboxButton.RightTrigger).onTrue(extendIntakeAndRetractIfHasPieceCommand);
         
+        ParallelCommandGroup retractWithIntake = retractCollectorCommandForIntake.alongWith(intakeCollectorCommandForRetract);
+        ParallelCommandGroup retractWithStop = retractCollectorCommandForStop.alongWith(stopCollectorCommandForRetract);
+        ConditionalCommand retract = new ConditionalCommand(retractWithIntake, retractWithStop, () -> collector.hasGamePiece());
 
+        operatorInterface.gamepad.getXboxButton(XboxButton.RightTrigger).onFalse(retract);
+        
       }
 }
