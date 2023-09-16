@@ -3,6 +3,7 @@ package competition.subsystems.collector;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import competition.operator_interface.OperatorInterface;
 import xbot.common.command.BaseSubsystem;
 import xbot.common.controls.actuators.XCANSparkMax;
 import xbot.common.controls.actuators.XSolenoid;
@@ -24,6 +25,9 @@ public class CollectorSubsystem extends BaseSubsystem {
     public double hasPieceTime;
     public double startOfHasPiece;
     public DoubleProperty hasGamePieceMotorPower;
+    public CollectorState collectorState;
+
+    public final OperatorInterface oi;
     
 
     public enum CollectorState {
@@ -40,7 +44,7 @@ public class CollectorSubsystem extends BaseSubsystem {
     IntakeState intakeState = IntakeState.Stopped;
 
     @Inject
-    public CollectorSubsystem(XSolenoid.XSolenoidFactory xSolenoidFactory, XCANSparkMax.XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact) {
+    public CollectorSubsystem(XSolenoid.XSolenoidFactory xSolenoidFactory, XCANSparkMax.XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact, OperatorInterface oi) {
         this.collectorSolenoid = xSolenoidFactory.create(2);
         this.collectorMotor = sparkMaxFactory.create(new DeviceInfo(25, true), getPrefix(), "CollectorMotor");
 
@@ -53,15 +57,18 @@ public class CollectorSubsystem extends BaseSubsystem {
         hasGamePieceThreshold = pFact.createPersistentProperty("GamePieceThreshold", 1000);
         hasGamePieceMotorPower = pFact.createPersistentProperty("HasGamePieceMotorPower", 0.05);
 
+        this.oi = oi;
+
     }
 
     private void changeCollector(CollectorState state) {
         if (state == CollectorState.Extended) {
             collectorSolenoid.setOn(true);
-
+            collectorState = CollectorState.Extended;
         }
         else if (state == CollectorState.Retracted) {
             collectorSolenoid.setOn(false);
+            collectorState = CollectorState.Retracted;
         }
     }
 
@@ -100,6 +107,8 @@ public class CollectorSubsystem extends BaseSubsystem {
 
     @Override
     public void periodic() {
+
+        // checks if the intake system has a game piece
         motorSpeed.set(collectorMotor.getVelocity());
         if (motorSpeed.get() < hasGamePieceThreshold.get() && intakeState == IntakeState.Intaking) {
             if (startOfHasPiece == 0) {
@@ -114,6 +123,19 @@ public class CollectorSubsystem extends BaseSubsystem {
         }
         boolean hasPiece = (motorSpeed.get() < hasGamePieceThreshold.get() && intakeState == IntakeState.Intaking && hasPieceTime > 0.2);
         hasGamePiece.set(hasPiece);
+
+        // rumbles controller if game piece is collected
+        double intensity = 0.5;
+        if (collectorState == CollectorState.Retracted) {
+            intensity = 0.1;
+        }
+
+        if (hasPiece) {
+            oi.gamepad.getRumbleManager().rumbleGamepad(intensity, 0.1);
+        }
+        else {
+            oi.gamepad.getRumbleManager().stopGamepadRumble();
+        }
     }
 
     public boolean hasGamePiece() {

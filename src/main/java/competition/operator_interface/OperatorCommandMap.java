@@ -49,6 +49,8 @@ public class OperatorCommandMap {
         operatorInterface.gamepad.getXboxButton(XboxButton.B).onTrue(ejectCollectorCommand);
         operatorInterface.gamepad.getXboxButton(XboxButton.B).onFalse(stopCollectorCommand);
         operatorInterface.gamepad.getXboxButton(XboxButton.X).onTrue(stopCollectorCommand);
+        operatorInterface.gamepad.getXboxButton(XboxButton.LeftTrigger).onTrue(ejectCollectorCommand);
+        operatorInterface.gamepad.getXboxButton(XboxButton.LeftTrigger).onFalse(stopCollectorCommand);
 
         
         // extends and runs intake, retracts if has piece
