@@ -131,10 +131,10 @@ public class CollectorSubsystem extends BaseSubsystem {
         }
 
         if (hasPiece) {
-            oi.gamepad.getRumbleManager().rumbleGamepad(intensity, 0.1);
+            oi.operatorGamepad.getRumbleManager().rumbleGamepad(intensity, 0.1);
         }
         else {
-            oi.gamepad.getRumbleManager().stopGamepadRumble();
+            oi.operatorGamepad.getRumbleManager().stopGamepadRumble();
         }
     }
 
