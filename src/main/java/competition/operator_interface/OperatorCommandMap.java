@@ -63,13 +63,4 @@ public class OperatorCommandMap {
         
       }
 
-    public void setupDriveCommands(
-            OperatorInterface operatorInterface,
-            SetRobotHeadingCommand resetHeading) {
-        resetHeading.setHeadingToApply(90);
-        operatorInterface.operatorGamepad.getifAvailable(1).onTrue(resetHeading);
-
-
-
-      }
 }
