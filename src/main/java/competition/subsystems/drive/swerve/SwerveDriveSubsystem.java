@@ -20,12 +20,12 @@ public class SwerveDriveSubsystem extends BaseSubsystem {
 
     @Inject
     public SwerveDriveSubsystem(XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact, OperatorInterface oi) {
-        this.driveMotor = sparkMaxFactory.create(new DeviceInfo(29, true), getPrefix(), "DriveMotor");
+        this.driveMotor = sparkMaxFactory.create(new DeviceInfo(29, false), getPrefix(), "DriveMotor");
         this.oi = oi;
 
         pFact.setPrefix(this);
 
-        leftJoystickPower = pFact.createEphemeralProperty("JoystickPower", 0);
+        leftJoystickPower = pFact.createEphemeralProperty("LeftJoystickPower", 0);
     }
 
     public void setPower(Double power) {
