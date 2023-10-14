@@ -8,6 +8,7 @@ import competition.subsystems.drive.swerve.SwerveSteerSubsystem;
 import edu.wpi.first.math.geometry.Rotation2d;
 import xbot.common.command.BaseCommand;
 import xbot.common.controls.sensors.XCANCoder;
+import xbot.common.math.MathUtils;
 import xbot.common.math.PIDManager;
 import xbot.common.math.PIDManager.PIDManagerFactory;
 import xbot.common.subsystems.pose.BasePoseSubsystem;
@@ -20,6 +21,7 @@ public class SteerAndDriveJoystickCommand extends BaseCommand {
     public BasePoseSubsystem pose;
     public XCANCoder encoder;
     public PIDManager pid;
+    public double steerPower;
 
     @Inject
     public SteerAndDriveJoystickCommand(SwerveDriveSubsystem swerveDriveSubsystem, SwerveSteerSubsystem swerveSteerSubsystem, OperatorInterface oi, PIDManagerFactory pManagerFactory) {
@@ -37,7 +39,7 @@ public class SteerAndDriveJoystickCommand extends BaseCommand {
     }
 
     public double calculateHeadingPower() {
-        Rotation2d targetAngle = Rotation2d.fromDegrees(oi.driverGamepad.getLeftVector().getAngle());
+        Rotation2d targetAngle = Rotation2d.fromDegrees(oi.driverGamepad.getLeftVector().getAngle() - 90);
         double error = swerveSteerSubsystem.getEncoderAngle().minus(targetAngle).getDegrees();
 
         double steerPower = pid.calculate(0, error);
@@ -47,11 +49,15 @@ public class SteerAndDriveJoystickCommand extends BaseCommand {
 
     @Override
     public void execute() {
-        // double joyStickPower = oi.driverGamepad.getLeftVector().getMagnitude();
+        double drivePower = oi.driverGamepad.getLeftVector().getMagnitude();
 
-        // swerveDriveSubsystem.setPower(joyStickPower);
 
-        double steerPower = calculateHeadingPower();
+        swerveDriveSubsystem.setPower(MathUtils.deadband(drivePower, 0.2));
+        steerPower = calculateHeadingPower();
+        if (drivePower < 0.5) {
+            steerPower = 0;
+        }
+
         swerveSteerSubsystem.setPower(steerPower);
 
         

@@ -30,10 +30,14 @@ public class SwerveSteerSubsystem extends BaseSubsystem {
     public SwerveSteerSubsystem(XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact, OperatorInterface oi,
                                 XCANCoderFactory canCoderFactory, ElectricalContract electricalContract, PIDManagerFactory pidManagerFactory,
                                 PropertyFactory pFactory) {
-        this.steerMotor = sparkMaxFactory.create(new DeviceInfo(28, false), getPrefix(), "SteerMotor");
+        this.steerMotor = sparkMaxFactory.create(new DeviceInfo(30, false), getPrefix(), "SteerMotor");
+        // this.steerMotor = sparkMaxFactory.create(new DeviceInfo(28, false), getPrefix(), "SteerMotor");
+
         this.oi = oi;
         this.contract = electricalContract;
-        this.encoder = canCoderFactory.create(new DeviceInfo(52, false), getPrefix());
+        this.encoder = canCoderFactory.create(new DeviceInfo(51, false), getPrefix());
+        // this.encoder = canCoderFactory.create(new DeviceInfo(52, false), getPrefix());
+
         this.wheelAngle = pFact.createEphemeralProperty("Wheel Angle", 0);
 
         pFact.setPrefix(this);

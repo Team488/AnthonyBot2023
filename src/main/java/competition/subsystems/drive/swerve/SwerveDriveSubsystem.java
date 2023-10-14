@@ -14,13 +14,15 @@ import xbot.common.properties.PropertyFactory;
 @Singleton
 public class SwerveDriveSubsystem extends BaseSubsystem {
     
-    public XCANSparkMax driveMotor;
+    public XCANSparkMax frontLeftDriveMotor;
     public DoubleProperty leftJoystickPower;
     public OperatorInterface oi;
 
     @Inject
     public SwerveDriveSubsystem(XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact, OperatorInterface oi) {
-        this.driveMotor = sparkMaxFactory.create(new DeviceInfo(29, false), getPrefix(), "DriveMotor");
+        this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(31, false), getPrefix(), "DriveMotor");
+        // this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(29, false), getPrefix(), "DriveMotor");
+
         this.oi = oi;
 
         pFact.setPrefix(this);
@@ -29,13 +31,12 @@ public class SwerveDriveSubsystem extends BaseSubsystem {
     }
 
     public void setPower(Double power) {
-        driveMotor.set(power);
+        frontLeftDriveMotor.set(power);
     }
 
     @Override
     public void periodic() {
-        
         // checks joystick power using ephemeral property
-        leftJoystickPower.set(oi.driverGamepad.getLeftStickY());
+        leftJoystickPower.set(oi.driverGamepad.getLeftVector().getMagnitude());
     }
 }
