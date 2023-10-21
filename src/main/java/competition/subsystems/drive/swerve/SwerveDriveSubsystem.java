@@ -20,8 +20,11 @@ public class SwerveDriveSubsystem extends BaseSubsystem {
 
     @Inject
     public SwerveDriveSubsystem(XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact, OperatorInterface oi) {
-        this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(31, false), getPrefix(), "DriveMotor");
-        // this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(29, false), getPrefix(), "DriveMotor");
+
+        // front left motor
+        // this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(31, false), getPrefix(), "DriveMotor");
+        // front right motor
+        this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(29, false), getPrefix(), "DriveMotor");
 
         this.oi = oi;
 

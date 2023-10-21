@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import competition.electrical_contract.ElectricalContract;
 import competition.operator_interface.OperatorInterface;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import xbot.common.command.BaseSubsystem;
 import xbot.common.controls.actuators.XCANSparkMax;
 import xbot.common.controls.actuators.XCANSparkMax.XCANSparkMaxFactory;
@@ -30,15 +31,21 @@ public class SwerveSteerSubsystem extends BaseSubsystem {
     public SwerveSteerSubsystem(XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact, OperatorInterface oi,
                                 XCANCoderFactory canCoderFactory, ElectricalContract electricalContract, PIDManagerFactory pidManagerFactory,
                                 PropertyFactory pFactory) {
-        this.steerMotor = sparkMaxFactory.create(new DeviceInfo(30, false), getPrefix(), "SteerMotor");
-        // this.steerMotor = sparkMaxFactory.create(new DeviceInfo(28, false), getPrefix(), "SteerMotor");
+        
+        // front left motor
+        // this.steerMotor = sparkMaxFactory.create(new DeviceInfo(30, false), getPrefix(), "SteerMotor");
+        // front right motor
+        this.steerMotor = sparkMaxFactory.create(new DeviceInfo(28, false), getPrefix(), "SteerMotor");
 
         this.oi = oi;
         this.contract = electricalContract;
-        this.encoder = canCoderFactory.create(new DeviceInfo(51, false), getPrefix());
-        // this.encoder = canCoderFactory.create(new DeviceInfo(52, false), getPrefix());
 
-        this.wheelAngle = pFact.createEphemeralProperty("Wheel Angle", 0);
+        // front left encoder
+        // this.encoder = canCoderFactory.create(new DeviceInfo(51, false), getPrefix());
+        // front right encoder
+        this.encoder = canCoderFactory.create(new DeviceInfo(52, false), getPrefix());
+
+        this.wheelAngle = pFact.createEphemeralProperty("WheelAngle", 0);
 
         pFact.setPrefix(this);
 
@@ -51,6 +58,12 @@ public class SwerveSteerSubsystem extends BaseSubsystem {
 
     public Rotation2d getEncoderAngle() {
         return Rotation2d.fromDegrees(encoder.getAbsolutePosition());
+    }
+
+    public SwerveModuleState getOptimizedSwerveModuleState(double joystickAngle, double power) {
+        Rotation2d targetAngle = Rotation2d.fromDegrees(joystickAngle);
+        SwerveModuleState swerveModuleState = new SwerveModuleState(power, targetAngle);
+        return SwerveModuleState.optimize(swerveModuleState, getEncoderAngle());
     }
 
     @Override
