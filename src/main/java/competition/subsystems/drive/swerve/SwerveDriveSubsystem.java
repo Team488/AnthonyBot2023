@@ -17,6 +17,7 @@ public class SwerveDriveSubsystem extends BaseSubsystem {
     public XCANSparkMax frontLeftDriveMotor;
     public DoubleProperty leftJoystickPower;
     public OperatorInterface oi;
+    private int driveChannel;
 
     @Inject
     public SwerveDriveSubsystem(XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact, OperatorInterface oi) {
@@ -24,7 +25,8 @@ public class SwerveDriveSubsystem extends BaseSubsystem {
         // front left motor
         // this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(31, false), getPrefix(), "DriveMotor");
         // front right motor
-        this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(29, false), getPrefix(), "DriveMotor");
+        // this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(29, false), getPrefix(), "DriveMotor");
+        this.frontLeftDriveMotor = sparkMaxFactory.create(new DeviceInfo(driveChannel, false), getPrefix(), "DriveMotor");
 
         this.oi = oi;
 
@@ -35,6 +37,10 @@ public class SwerveDriveSubsystem extends BaseSubsystem {
 
     public void setPower(Double power) {
         frontLeftDriveMotor.set(power);
+    }
+
+    public void setChannel(int driveChannel) {
+        this.driveChannel = driveChannel;
     }
 
     @Override

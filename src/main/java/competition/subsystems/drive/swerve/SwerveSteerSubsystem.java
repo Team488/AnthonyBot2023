@@ -26,6 +26,8 @@ public class SwerveSteerSubsystem extends BaseSubsystem {
     public XCANCoder encoder;
     public ElectricalContract contract;
     public DoubleProperty wheelAngle;
+    private int steerChannel;
+    private int encoderChannel;
 
     @Inject
     public SwerveSteerSubsystem(XCANSparkMaxFactory sparkMaxFactory, PropertyFactory pFact, OperatorInterface oi,
@@ -35,7 +37,8 @@ public class SwerveSteerSubsystem extends BaseSubsystem {
         // front left motor
         // this.steerMotor = sparkMaxFactory.create(new DeviceInfo(30, false), getPrefix(), "SteerMotor");
         // front right motor
-        this.steerMotor = sparkMaxFactory.create(new DeviceInfo(28, false), getPrefix(), "SteerMotor");
+        // this.steerMotor = sparkMaxFactory.create(new DeviceInfo(28, false), getPrefix(), "SteerMotor");
+        this.steerMotor = sparkMaxFactory.create(new DeviceInfo(steerChannel, false), getPrefix(), "SteerMotor");
 
         this.oi = oi;
         this.contract = electricalContract;
@@ -43,7 +46,8 @@ public class SwerveSteerSubsystem extends BaseSubsystem {
         // front left encoder
         // this.encoder = canCoderFactory.create(new DeviceInfo(51, false), getPrefix());
         // front right encoder
-        this.encoder = canCoderFactory.create(new DeviceInfo(52, false), getPrefix());
+        // this.encoder = canCoderFactory.create(new DeviceInfo(52, false), getPrefix());
+        this.encoder = canCoderFactory.create(new DeviceInfo(encoderChannel, false), getPrefix());
 
         this.wheelAngle = pFact.createEphemeralProperty("WheelAngle", 0);
 
@@ -54,6 +58,11 @@ public class SwerveSteerSubsystem extends BaseSubsystem {
 
     public void setPower(double power) {
         steerMotor.set(power);
+    }
+
+    public void setChannels(int steerChannel, int encoderChannel) {
+        this.steerChannel = steerChannel;
+        this.encoderChannel = encoderChannel;
     }
 
     public Rotation2d getEncoderAngle() {

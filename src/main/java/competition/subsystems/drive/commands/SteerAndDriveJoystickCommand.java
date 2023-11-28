@@ -26,7 +26,6 @@ public class SteerAndDriveJoystickCommand extends BaseCommand {
     public PIDManager pid;
     public double steerPower;
 
-    // properties
     public DoubleProperty steerPowerProperty;
     public DoubleProperty optimizedAngleProperty;
     public DoubleProperty joystickAngleProperty;
@@ -54,7 +53,6 @@ public class SteerAndDriveJoystickCommand extends BaseCommand {
     public void initialize() {
         
     }
-
     
     @Override
     public void execute() {
